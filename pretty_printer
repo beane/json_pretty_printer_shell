@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# for each character
+# if it's normal, print it out
+# if it's a control character, print newlines and tabs accordingly
+
+SPACE=' '
+OPEN_CHARS='{[('
+CLOSE_CHARS='}])'
+COMMA=','
+QUOTE='"'
+COLON=':'
+SPECIAL_CHARS="$OPEN_CHARS""$CLOSE_CHARS""$COMMA""$QUOTE""$COLON"
+
+NUM_TABS=0
+QUOTED=1
+
+print_tabs() {
+    [[ -z "$1" ]] && printf "print_tabs needs a number\n" && exit 1
+    [[ "$1" = 0 ]] && return
+
+    for i in $(seq 1 "$1"); do
+        printf '    '
+    done
+}
+
+while IFS='' read -r -n1 -d '' char; do
+    if [[ ! "$SPECIAL_CHARS" =~ "$char" ]]; then
+        [ "$QUOTED" -eq 1 -a "$SPACE" = "$char" ] && continue
+        printf "$char"
+        continue
+    fi
+
+    if [[ "$QUOTE" = "$char" ]]; then
+        if [[ "$QUOTED" = 1 ]]; then
+            QUOTED=0
+        else
+            QUOTED=1
+        fi
+        printf "$char"
+        continue
+    fi
+
+    if [[ "$OPEN_CHARS" =~ "$char" ]]; then
+        printf "$char"
+        printf '\n'
+        NUM_TABS=$(( $NUM_TABS + 1 ))
+        print_tabs "$NUM_TABS"
+    elif [[ "$CLOSE_CHARS" =~ "$char" ]]; then
+        printf '\n'
+        NUM_TABS=$(( $NUM_TABS - 1 ))
+        print_tabs "$NUM_TABS"
+        printf "$char"
+    elif [[ "$COMMA" = "$char" ]]; then
+        printf "$char"
+        printf '\n'
+        print_tabs "$NUM_TABS"
+    elif [[ "$COLON" = "$char" ]]; then
+        printf "$char"
+        printf ' '
+    fi
+done
+
