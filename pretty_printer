@@ -10,10 +10,12 @@ CLOSE_CHARS='}])'
 COMMA=','
 QUOTE='"'
 COLON=':'
-SPECIAL_CHARS="$OPEN_CHARS""$CLOSE_CHARS""$COMMA""$QUOTE""$COLON"
+BACKSLASH='\'
+SPECIAL_CHARS="$OPEN_CHARS""$CLOSE_CHARS""$COMMA""$QUOTE""$COLON""$BACKSLASH"
 
 NUM_TABS=0
 QUOTED=1
+ESCAPED=1
 
 print_tabs() {
     [[ -z "$1" ]] && printf "print_tabs needs a number\n" && exit 1
@@ -38,6 +40,22 @@ while IFS='' read -r -n1 -d '' char; do
             QUOTED=1
         fi
         printf "$char"
+        continue
+    fi
+
+    if [[ "$BACKSLASH" = "$char" ]]; then
+        if [[ "$ESCAPED" = 1 ]]; then
+            ESCAPED=0
+        else
+            ESCAPED=1
+        fi
+        printf "$char"
+        continue
+    fi
+
+    if [[ "$ESCAPED" = 0 ]];then
+        printf "$char"
+        ESCAPED=1
         continue
     fi
 
