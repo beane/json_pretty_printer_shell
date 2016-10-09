@@ -27,6 +27,9 @@ print_tabs() {
 }
 
 while IFS='' read -r -n1 -d '' char; do
+    # skip newline characters
+    [[ "$char" = $'\n' ]] && continue
+
     if [[ ! "$SPECIAL_CHARS" =~ "$char" ]]; then
         [ "$QUOTED" -eq 1 -a "$SPACE" = "$char" ] && continue
         printf "$char"
