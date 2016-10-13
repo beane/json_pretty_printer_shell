@@ -57,7 +57,7 @@ while IFS='' read -r -n1 -d '' char; do
     # skip if it's a non-quoted space
     # also restart the loop
     if [[ ! "$SPECIAL_CHARS" =~ "$char" ]]; then
-        [ "$QUOTED" -eq 1 -a "$SPACE" = "$char" ] && continue
+        [[ "$QUOTED" -eq 1 && "$SPACE" = "$char" ]] && continue
         printf "$char"
         continue
     fi
