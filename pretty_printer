@@ -1,8 +1,23 @@
 #!/bin/bash
 
-# for each character
-# if it's normal, print it out
-# if it's a control character, print newlines and tabs accordingly
+# JSON Pretty Printer
+# Author: beane
+
+# This script tries to pretty print JSON-like data that is piped to it.
+# It makes no assumptions about the validity of the input, nor will it 
+# try to validate anything. The printer reads input characters one-by-one.
+
+# The idea was to pretty print JSON-like data, even if it isn't valid.
+# Other pretty printers would simply break on invalid JSON.
+
+# Gotchas:
+#     - supresses non-quoted whitespace for prettiness purposes
+#     - skips newline characters for further prettification
+#     - automatically inserts a space after colons in "key": "value" pairs
+#     - prints 4 spaces (not tabs!) when indenting
+
+# Usage:
+# cat janky.json | ./pretty_printer
 
 SPACE=' '
 OPEN_CHARS='{[('
@@ -26,16 +41,30 @@ print_tabs() {
     done
 }
 
+# for each character
+# if it's normal, print it out
+# if it's a control character, print newlines and tabs accordingly
+
+# read input stream character-by-character
 while IFS='' read -r -n1 -d '' char; do
     # skip newline characters
     [[ "$char" = $'\n' ]] && continue
 
+    # PART 1: set program state
+
+    # if character is a "special" character,
+    # just print it out
+    # skip if it's a non-quoted space
+    # also restart the loop
     if [[ ! "$SPECIAL_CHARS" =~ "$char" ]]; then
         [ "$QUOTED" -eq 1 -a "$SPACE" = "$char" ] && continue
         printf "$char"
         continue
     fi
 
+    # if the character is a quote,
+    # swap the QUOTED bool
+    # then print character and restart the loop
     if [[ "$QUOTE" = "$char" ]]; then
         if [[ "$QUOTED" = 1 ]]; then
             QUOTED=0
@@ -46,6 +75,9 @@ while IFS='' read -r -n1 -d '' char; do
         continue
     fi
 
+    # if character is a backslash,
+    # swap the BACKSLASH bool
+    # then print it and restart the loop
     if [[ "$BACKSLASH" = "$char" ]]; then
         if [[ "$ESCAPED" = 1 ]]; then
             ESCAPED=0
@@ -56,11 +88,17 @@ while IFS='' read -r -n1 -d '' char; do
         continue
     fi
 
+    # if this character is escaped (previous character was a non-escaped backslash)
+    # print it, swap the ESCAPED bool and restart the loop
+    # this basically tells the printer to avoid all the newline and tab
+    # processing that comes later
     if [[ "$ESCAPED" = 0 ]];then
         printf "$char"
         ESCAPED=1
         continue
     fi
+
+    # PART 2: print special control characters with tabs and newlines as appropriate
 
     if [[ "$OPEN_CHARS" =~ "$char" ]]; then
         printf "$char"
@@ -84,3 +122,4 @@ done
 
 printf '\n'
 exit 0
+
