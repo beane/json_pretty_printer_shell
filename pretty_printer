@@ -92,9 +92,14 @@ while IFS='' read -r -n1 -d '' char; do
     # print it, swap the ESCAPED bool and restart the loop
     # this basically tells the printer to avoid all the newline and tab
     # processing that comes later
-    if [[ "$ESCAPED" = 0 ]];then
+    if [[ "$ESCAPED" = 0 ]]; then
         printf "$char"
         ESCAPED=1
+        continue
+    fi
+
+    if [[ "$QUOTED" = 0 ]]; then
+        printf "$char"
         continue
     fi
 
@@ -116,7 +121,7 @@ while IFS='' read -r -n1 -d '' char; do
         print_tabs "$NUM_TABS"
     elif [[ "$COLON" = "$char" ]]; then
         printf "$char"
-        [[ "$QUOTED" = 1 ]] && printf ' '
+        printf ' '
     fi
 done
 

@@ -1,1 +1,1 @@
-{"key1":"v:alue1","key2":[notanull, truethy,falsey, [ true, false, n:xull], \\"\}escaped\"\\\"":\}"\\"\\, {"this":"that","nested":{"do" : "you doubt:me!?"}]}, "number" : 13.34}
+{"key1":"v:alue1","key2":[notanull, truethy,falsey, [ true, false, n:xull], \\"\}escaped\"\\\"":\}"\\"\\, {"this":"that","nested":{"do" : "you doubt:me!?"}]}, "number" : 13.34,"{{{shouldn't get indented}}}":"}}}this too{{{" }
