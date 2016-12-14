@@ -52,7 +52,7 @@ while IFS='' read -r -n1 -d '' char; do
 
     # PART 1: set program state
 
-    # if character is a "special" character,
+    # if character is NOT a "special" character,
     # just print it out
     # skip if it's a non-quoted space
     # also restart the loop
